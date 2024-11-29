@@ -7,27 +7,90 @@
     <title>Insert Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
     <?php
-        $sName = 'localhost';
-        $uName = 'root';
-        $uPass = '';
-        $dbName = 'it';
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // รับข้อมูลจากฟอร์ม
+        $Pname = $_POST['name'];
+        $count = $_POST['count'];
 
-        $conn = new mysqli($sName, $uName, $uPass, $dbName);
-        mysqli_set_charset($conn, "utf8");
-        // if($conn->connect_error){
-        //     echo $conn->connect_error;
-        //     exit;
-        // }
-        // else{
-        //     echo "Database Connected";
-        // }
-    
+        // ตรวจสอบว่าได้รับข้อมูลหรือไม่
+        if (!empty($Pname) && !empty($count)) {
+            // เชื่อมต่อฐานข้อมูล
+            $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+            // เตรียม SQL สำหรับการแทรกข้อมูล
+            $sql = "INSERT INTO list_pro (name, count) VALUES (:name, :count)";
+
+            // เตรียมคำสั่ง SQL
+            $stmt = $conn->prepare($sql);
+
+            // ผูกค่ากับตัวแปร
+            $stmt->bindParam(':name', $Pname);
+            $stmt->bindParam(':count', $count);
+
+            // Execute SQL
+            $stmt->execute();
+
+            // ปิดการเชื่อมต่อ
+            $conn = null;
+        } else {
+            echo "กรุณากรอกข้อมูลให้ครบถ้วน";
+        }
+    }
     ?>
+
+
+
+    <?php
+    // เชื่อมต่อฐานข้อมูล
+    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+    // ตรวจสอบหากมีการขอลบสินค้าจาก URL
+    if (isset($_GET['delete_id'])) {
+        $deleteId = $_GET['delete_id'];
+
+        // เตรียม SQL สำหรับการลบข้อมูล
+        $sql = "DELETE FROM list_pro WHERE id = :id";
+
+        // เตรียมคำสั่ง SQL
+        $stmt = $conn->prepare($sql);
+
+        // ผูกค่ากับตัวแปร
+        $stmt->bindParam(':id', $deleteId);
+
+        // Execute SQL
+        $stmt->execute();
+    }
+
+    // ดึงข้อมูลทั้งหมดจากตาราง
+    $stmt = $conn->query("SELECT * FROM list_pro");
+    $products = $stmt->fetchAll();
+
+    // ปิดการเชื่อมต่อ
+    $conn = null;
+    ?>
+
+
+    <?php
+    // เชื่อมต่อฐานข้อมูล
+    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+    // ดึงข้อมูลทั้งหมดจากตาราง
+    $stmt = $conn->query("SELECT * FROM list_pro");
+    $products = $stmt->fetchAll();
+
+    // ปิดการเชื่อมต่อ
+    $conn = null;
+    ?>
+
+    
+
+
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Navbar</a>
@@ -50,53 +113,62 @@
         </div>
     </nav>
 
-    <h1 class="mt-4 text-center">รายการสินค้าที่ต้องซื้อ</h1>
-    <div class="col-md-1 col-sm-1"></div>
-    <div class="md-3 col-md-10 col-sm-10 ">
-        <div>
-            <label for="exampleFormControlInput1" class="form-label">ชื่อ</label>
-            <input class="form-control" id="exampleFormControlInput1" placeholder="กรุณาใส่ชื่อสินค้า">
-        </div>
+    <div class="container">
 
-        <div>
-            <label for="exampleFormControlInput1" class="form-label">จำนวน</label>
-            <input class="form-control" id="exampleFormControlInput1" placeholder="กรุณากรอกจำนวนสินค้า">
-        </div>
-        <div class="mt-4">
-            <button type="button" class="btn btn-success">เพิ่ม</button>
-        </div>
+        <h1 class="mt-4 text-center">รายการสินค้าที่ต้องซื้อ</h1>
 
+        <div class="row">
+
+            <div class="md-3 col-sm-1 col-md-10 col-lg-10">
+                <form method="POST" action="">
+                    <div>
+                        <label for="exampleFormControlInput1" class="form-label mt-4">ชื่อ</label>
+                        <input class="form-control" id="exampleFormControlInput1" name="name" placeholder="กรุณาใส่ชื่อสินค้า">
+                    </div>
+
+                    <div>
+                        <label for="exampleFormControlInput2" class="form-label mt-4">จำนวน</label>
+                        <input class="form-control" id="exampleFormControlInput2" name="count" placeholder="กรุณากรอกจำนวนสินค้า">
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">เพิ่ม</button>
+                    </div>
+                </form>
+
+
+            </div>
+
+
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">ชื่อ</th>
+                        <th scope="col">จำนวน</th>
+                        <th scope="col">ลบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($products as $index => $product): ?>
+                        <tr>
+                            <th scope="row"><?php echo $index + 1; ?></th>
+                            <td><?php echo htmlspecialchars($product['name']); ?></td>
+                            <td><?php echo htmlspecialchars($product['count']); ?></td>
+                            <td>
+                                <!-- ปุ่มลบส่งไปยังสคริปต์พร้อมกับ ID ของสินค้าที่จะลบ -->
+                                <a href="?delete_id=<?php echo $product['id']; ?>" class="btn btn-danger">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+
+        </div>
     </div>
-
-    <table class="table mt-4">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">ชื่อ</th>
-                <th scope="col">จำนวน</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td colspan="2">Larry the Bird</td>
-                <td>@twitter</td>
-            </tr>
-        </tbody>
-    </table>
-
 
 
 </body>
