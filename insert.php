@@ -12,24 +12,124 @@
 
 <body>
     <?php
-    $sName = 'localhost';
-    $uName = 'root';
-    $uPass = '';
-    $dbName = 'db';
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // รับข้อมูลจากฟอร์ม
+        $Pname = $_POST['name'];
+        $count = $_POST['count'];
 
-    $conn = new PDO("mysql:host=$sName; dbname=$dbName", $uName, $uPass);
-    $conn->exec("SET CHARACTER SET utf8");
+        // ตรวจสอบว่าได้รับข้อมูลหรือไม่
+        if (!empty($Pname) && !empty($count)) {
+            // เชื่อมต่อฐานข้อมูล
+            $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
 
-    $result = $conn->query("SELECT name, count FROM list_pro");
+            // เตรียม SQL สำหรับการแทรกข้อมูล
+            $sql = "INSERT INTO list_pro (name, count) VALUES (:name, :count)";
 
-    if($result !== false){
-        echo 'There is ' . $result->rowCount() . "application in db <br>";
-        foreach($result as $row){
-            echo '- ' . $row['name'] ." " . $row['count'];
+            // เตรียมคำสั่ง SQL
+            $stmt = $conn->prepare($sql);
+
+            // ผูกค่ากับตัวแปร
+            $stmt->bindParam(':name', $Pname);
+            $stmt->bindParam(':count', $count);
+
+            // Execute SQL
+            $stmt->execute();
+
+            // ปิดการเชื่อมต่อ
+            $conn = null;
+        } else {
+            echo "กรุณากรอกข้อมูลให้ครบถ้วน";
         }
     }
-
     ?>
+
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // รับข้อมูลจากฟอร์ม
+        $Pname = $_POST['name'];
+        $count = $_POST['count'];
+
+        // ตรวจสอบว่าได้รับข้อมูลหรือไม่
+        if (!empty($Pname) && !empty($count)) {
+            // เชื่อมต่อฐานข้อมูล
+            $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+            // ตรวจสอบชื่อสินค้าว่าซ้ำหรือไม่
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM list_pro WHERE name = :name");
+            $stmt->bindParam(':name', $Pname);
+            $stmt->execute();
+            $countResult = $stmt->fetchColumn();
+
+            // ถ้ามีสินค้าชื่อนี้แล้ว
+            if ($countResult > 0) {
+                echo "<p class='text-danger'>ชื่อสินค้านี้มีอยู่ในฐานข้อมูลแล้ว กรุณากรอกชื่ออื่น</p>";
+            } else {
+                // เตรียม SQL สำหรับการแทรกข้อมูล
+                $sql = "INSERT INTO list_pro (name, count) VALUES (:name, :count)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':name', $Pname);
+                $stmt->bindParam(':count', $count);
+
+                // Execute SQL
+                $stmt->execute();
+
+                echo "<p class='text-success'>สินค้าถูกเพิ่มเรียบร้อยแล้ว</p>";
+            }
+
+            // ปิดการเชื่อมต่อ
+            $conn = null;
+        }
+    }
+    ?>
+
+
+
+    <?php
+    // เชื่อมต่อฐานข้อมูล
+    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+    // ตรวจสอบหากมีการขอลบสินค้าจาก URL
+    if (isset($_GET['delete_id'])) {
+        $deleteId = $_GET['delete_id'];
+
+        // เตรียม SQL สำหรับการลบข้อมูล
+        $sql = "DELETE FROM list_pro WHERE id = :id";
+
+        // เตรียมคำสั่ง SQL
+        $stmt = $conn->prepare($sql);
+
+        // ผูกค่ากับตัวแปร
+        $stmt->bindParam(':id', $deleteId);
+
+        // Execute SQL
+        $stmt->execute();
+    }
+
+    // ดึงข้อมูลทั้งหมดจากตาราง
+    $stmt = $conn->query("SELECT * FROM list_pro");
+    $products = $stmt->fetchAll();
+
+    // ปิดการเชื่อมต่อ
+    $conn = null;
+    ?>
+
+
+    <?php
+    // เชื่อมต่อฐานข้อมูล
+    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+
+    // ดึงข้อมูลทั้งหมดจากตาราง
+    $stmt = $conn->query("SELECT * FROM list_pro");
+    $products = $stmt->fetchAll();
+
+    // ปิดการเชื่อมต่อ
+    $conn = null;
+    ?>
+
+    
+
+
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Navbar</a>
@@ -59,18 +159,22 @@
         <div class="row">
 
             <div class="md-3 col-sm-1 col-md-10 col-lg-10">
-                <div>
-                    <label for="exampleFormControlInput1" class="form-label mt-4">ชื่อ</label>
-                    <input class="form-control" id="exampleFormControlInput1" placeholder="กรุณาใส่ชื่อสินค้า">
-                </div>
+                <form method="POST" action="">
+                    <div>
+                        <label for="exampleFormControlInput1" class="form-label mt-4">ชื่อ</label>
+                        <input class="form-control" id="exampleFormControlInput1" name="name" placeholder="กรุณาใส่ชื่อสินค้า">
+                    </div>
 
-                <div>
-                    <label for="exampleFormControlInput1" class="form-label mt-4">จำนวน</label>
-                    <input class="form-control" id="exampleFormControlInput1" placeholder="กรุณากรอกจำนวนสินค้า">
-                </div>
-                <div class="mt-4">
-                    <button type="button" class="btn btn-success">เพิ่ม</button>
-                </div>
+                    <div>
+                        <label for="exampleFormControlInput2" class="form-label mt-4">จำนวน</label>
+                        <input class="form-control" id="exampleFormControlInput2" name="count" placeholder="กรุณากรอกจำนวนสินค้า">
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">เพิ่ม</button>
+                    </div>
+                </form>
+
 
             </div>
 
@@ -81,23 +185,27 @@
                         <th scope="col">#</th>
                         <th scope="col">ชื่อ</th>
                         <th scope="col">จำนวน</th>
+                        <th scope="col">ลบ</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
+                    <?php foreach ($products as $index => $product): ?>
+                        <tr>
+                            <th scope="row"><?php echo $index + 1; ?></th>
+                            <td><?php echo htmlspecialchars($product['name']); ?></td>
+                            <td><?php echo htmlspecialchars($product['count']); ?></td>
+                            <td>
+                                <!-- ปุ่มลบส่งไปยังสคริปต์พร้อมกับ ID ของสินค้าที่จะลบ -->
+                                <a href="?delete_id=<?php echo $product['id']; ?>" class="btn btn-danger">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
+
+
         </div>
     </div>
 
