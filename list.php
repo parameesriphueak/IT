@@ -7,8 +7,15 @@ $dbName = 'db';
 $conn = new mysqli($sName, $uName, $uPass, $dbName);
 mysqli_set_charset($conn, "utf8");
 
-$sql = "SELECT id, name FROM list_pro";
+$sql = "SELECT id, name, count FROM list_pro";
 $result = $conn->query($sql);
+
+$options = array();
+while ($row = $result->fetch_assoc()) {
+  $options[] = $row;
+}
+
+$conn->close();
 
 ?>
 <!DOCTYPE html>
@@ -50,65 +57,58 @@ $result = $conn->query($sql);
   <h2 class="text-center">รายการที่ต้องซื้อ</h2>
   <div class="container">
     <div class="row">
-      <div class="col-lg-1 col-md-1 col-sm-1"></div>
-      <div class="col-lg-10 col-md-10 col-sm-10">
-        <button type="button" class="btn btn-primary" onclick="insertDropdown()"><i class="bi bi-plus"></i> เพิ่มรายการที่ต้องซื้อ</button>
-        <div id="insertDropdown"></div>
+      <div class="col-lg-3 col-md-3 col-sm-3"></div>
+      <div class="col-lg-6 col-md-6 col-sm-6">
+        <!-- <button type="button" class="btn btn-primary" onclick="insertDropdown()"><i class="bi bi-plus"></i> เพิ่มรายการที่ต้องซื้อ</button> -->
+        <!-- <div id="insertDropdown"></div> -->
+
+
+        <?php
+        $con1 = new PDO("mysql:host=localhost;dbname=db;charset=utf8", "root", "");
+        $sql1 = "SELECT id,name , count,status  FROM list_pro";
+        foreach ($con1->query($sql1) as $row) {
+        ?>
+          <div class="d-flex align-items-center">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <input type="checkbox" <?php if($row[3] == 1) echo 'checked';?>>
+            </div>
+            <div class="col-lg-5 col-md-5 col-sm-5">
+              <input type="text" value="<?= $row[1] ?>" disabled>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 ">
+              <input type="text" value="<?= $row[2] ?>" >
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <button class="btn btn-danger" onclick="deleteList(this)"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+
+
+
+        <?php }
+        $conn = null;
+        ?>
+
+
 
       </div>
 
 
     </div>
-    <div class="col-lg-1 col-md-1 col-sm-1"></div>
+    <div class="col-lg-3 col-md-3 col-sm-3"></div>
   </div>
   </div>
+
 
   <script>
-    function insertDropdown() {
-      const mainContainer = document.createElement('div');
-      mainContainer.classList.add('field', 'item', 'form-group');
-
-      const checkbox = document.createElement('input');
-      checkbox.setAttribute('for', 'checkbox');
-      checkbox.classList.add('form-check-input');
-      checkbox.type = 'checkbox';
-
-      mainContainer.appendChild(checkbox);
-
-      const colKPIMain = document.createElement('div');
-      colKPIMain.classList.add('col-md-6', 'col-sm-6');
-
-      const nameDropdown = document.createElement('select');
-      nameDropdown.classList.add('form-control');
-      nameDropdown.name = 'name';
-
-      <?php
-      while ($row = $result->fetch_assoc()) {
-        echo "const option = document.createElement('option');";
-        echo "option.value = '" . $row['id'] . "';";
-        echo "option.textContent = '" . $row['name'] . "';";
-        echo "nameDropdown.appendChild(option);";
+    // ฟังก์ชันลบแถวที่กด
+    function deleteList(button) {
+      // ใช้ parentElement เพื่อไปหาผู้ปกครองที่อยู่ในระดับเดียวกัน (แถว)
+      if (confirm('คุณต้องการลบใช่หรือไม่')) {
+        const row = button.closest('.d-flex'); // ค้นหา div ที่มี class "d-flex" ที่เป็นแถว
+        row.remove(); // ลบแถว
       }
-      ?>
 
-
-      colKPIMain.appendChild(nameDropdown);
-      mainContainer.appendChild(colKPIMain);
-
-      const deleteButton = document.createElement('button');
-      deleteButton.type = 'button';
-      deleteButton.classList.add('btn', 'btn-danger', 'ml-2'); // เพิ่มคลาส Bootstrap
-      deleteButton.textContent = 'ลบ';
-      deleteButton.onclick = function() {
-        mainContainer.remove(); // ลบ mainContainer เมื่อคลิกปุ่ม
-      };
-
-      // เพิ่มปุ่มลบลงใน mainContainer
-      mainContainer.appendChild(deleteButton);
-
-
-
-      document.getElementById('insertDropdown').appendChild(mainContainer);
     }
   </script>
 
