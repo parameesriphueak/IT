@@ -43,45 +43,6 @@
     }
     ?>
 
-    <?php
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // รับข้อมูลจากฟอร์ม
-        $Pname = $_POST['name'];
-        $count = $_POST['count'];
-
-        // ตรวจสอบว่าได้รับข้อมูลหรือไม่
-        if (!empty($Pname) && !empty($count)) {
-            // เชื่อมต่อฐานข้อมูล
-            $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
-
-            // ตรวจสอบชื่อสินค้าว่าซ้ำหรือไม่
-            $stmt = $conn->prepare("SELECT COUNT(*) FROM list_pro WHERE name = :name");
-            $stmt->bindParam(':name', $Pname);
-            $stmt->execute();
-            $countResult = $stmt->fetchColumn();
-
-            // ถ้ามีสินค้าชื่อนี้แล้ว
-            if ($countResult > 0) {
-                echo "<p class='text-danger'>ชื่อสินค้านี้มีอยู่ในฐานข้อมูลแล้ว กรุณากรอกชื่ออื่น</p>";
-            } else {
-                // เตรียม SQL สำหรับการแทรกข้อมูล
-                $sql = "INSERT INTO list_pro (name, count) VALUES (:name, :count)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':name', $Pname);
-                $stmt->bindParam(':count', $count);
-
-                // Execute SQL
-                $stmt->execute();
-
-                echo "<p class='text-success'>สินค้าถูกเพิ่มเรียบร้อยแล้ว</p>";
-            }
-
-            // ปิดการเชื่อมต่อ
-            $conn = null;
-        }
-    }
-    ?>
-
 
 
     <?php
