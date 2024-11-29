@@ -2,7 +2,7 @@
 $sName = 'localhost';
 $uName = 'root';
 $uPass = '';
-$dbName = 'db';
+$dbName = 'it';
 
 $conn = new mysqli($sName, $uName, $uPass, $dbName);
 mysqli_set_charset($conn, "utf8");
@@ -34,14 +34,14 @@ $conn->close();
 
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.php">Navbar</a>
+      <a class="navbar-brand" href="list.php">Navbar</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+            <a class="nav-link active" aria-current="page" href="">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="Insert.php">เพิ่ม</a>
@@ -64,7 +64,7 @@ $conn->close();
 
 
         <?php
-        $con1 = new PDO("mysql:host=localhost;dbname=db;charset=utf8", "root", "");
+        $con1 = new PDO("mysql:host=localhost;dbname=it;charset=utf8", "root", "");
         $sql1 = "SELECT id,name , count,status  FROM list_pro";
         foreach ($con1->query($sql1) as $row) {
         ?>

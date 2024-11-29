@@ -20,7 +20,7 @@
         // ตรวจสอบว่าได้รับข้อมูลหรือไม่
         if (!empty($Pname) && !empty($count)) {
             // เชื่อมต่อฐานข้อมูล
-            $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+            $conn = new PDO("mysql:host=localhost; dbname=it; charset=utf8", "root", "");
 
             // เตรียม SQL สำหรับการแทรกข้อมูล
             $sql = "INSERT INTO list_pro (name, count) VALUES (:name, :count)";
@@ -47,7 +47,7 @@
 
     <?php
     // เชื่อมต่อฐานข้อมูล
-    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+    $conn = new PDO("mysql:host=localhost; dbname=it; charset=utf8", "root", "");
 
     // ตรวจสอบหากมีการขอลบสินค้าจาก URL
     if (isset($_GET['delete_id'])) {
@@ -77,7 +77,7 @@
 
     <?php
     // เชื่อมต่อฐานข้อมูล
-    $conn = new PDO("mysql:host=localhost; dbname=db; charset=utf8", "root", "");
+    $conn = new PDO("mysql:host=localhost; dbname=it; charset=utf8", "root", "");
 
     // ดึงข้อมูลทั้งหมดจากตาราง
     $stmt = $conn->query("SELECT * FROM list_pro");
@@ -93,7 +93,7 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="list.php">Navbar</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -103,10 +103,10 @@
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">เพิ่ม</a>
+                        <a class="nav-link active" aria-current="page" href="insert.php">เพิ่ม</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">รายการ</a>
+                        <a class="nav-link" href="list.php">รายการ</a>
                     </li>
                 </ul>
             </div>
