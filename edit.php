@@ -17,18 +17,22 @@
     $uPass = '';
     $dbName = 'db';
 
-    $conn = new PDO("mysql:host=$sName; dbname=$dbName", $uName, $uPass);
-    $conn->exec("SET CHARACTER SET utf8");
-
-    $result = $conn->query("SELECT name, count FROM list_pro");
-
-    if($result !== false){
-        echo 'There is ' . $result->rowCount() . "application in db <br>";
-        foreach($result as $row){
-            echo '- ' . $row['name'] ." " . $row['count'];
-        }
+    $conn = new mysqli($sName, $uName, $uPass, $dbName);
+    mysqli_set_charset($conn, "utf8");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
 
+    $sql = "INSERT INTO db (name, count, status)
+      VALUES ('John', 'Doe', 'john@example.com')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "New record created successfully";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+    $conn->close();
     ?>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
@@ -95,6 +99,11 @@
                         <td>Jacob</td>
                         <td>Thornton</td>
                         <td>@fat</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td colspan="2">Larry the Bird</td>
+                        <td>@twitter</td>
                     </tr>
                 </tbody>
             </table>
